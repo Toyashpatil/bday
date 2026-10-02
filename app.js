@@ -327,6 +327,7 @@ function revealStory() {
 
   const dayAtReveal = activeDay.day;
   const itemAtReveal = activeDay;
+  startStoryMusic();
   launchConfetti();
 
   const seal = $("#sealStage");
@@ -391,6 +392,7 @@ async function saveAnswer() {
 }
 
 function closeModal() {
+  stopStoryMusic();
   $("#modal").classList.remove("visible");
   $("#modal").setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
@@ -563,3 +565,99 @@ async function setup() {
 }
 
 document.addEventListener("DOMContentLoaded", setup);
+/* =========================================================
+   STORY MUSIC
+   Humsafar instrumental — 18-day musical theme
+   This is independent of unlock / Supabase / answer logic.
+   ========================================================= */
+
+const storyMusic = document.getElementById("storyMusic");
+
+let storyMusicFadeTimer = null;
+
+function startStoryMusic() {
+  console.log("🔥 START STORY MUSIC CALLED");
+  if (!storyMusic) return;
+
+  // Clear any previous fade operation
+  if (storyMusicFadeTimer) {
+    clearInterval(storyMusicFadeTimer);
+    storyMusicFadeTimer = null;
+  }
+
+  // Start from the beginning every time a chapter opens
+  storyMusic.currentTime = 0;
+  storyMusic.volume = 1;
+
+  const playPromise = storyMusic.play();
+
+  if (playPromise !== undefined) {
+    playPromise
+      .then(() => {
+        fadeStoryMusicIn();
+      })
+      .catch(() => {
+        console.error("❌ MUSIC PLAYBACK FAILED:", error);
+      });
+  }
+}
+
+function fadeStoryMusicIn() {
+  if (!storyMusic) return;
+
+  const targetVolume = 0.08;
+  const duration = 2500;
+  const steps = 25;
+  let step = 0;
+
+  if (storyMusicFadeTimer) {
+    clearInterval(storyMusicFadeTimer);
+  }
+
+  storyMusicFadeTimer = setInterval(() => {
+    step++;
+
+    storyMusic.volume = Math.min(
+      targetVolume,
+      (targetVolume / steps) * step
+    );
+
+    if (step >= steps) {
+      clearInterval(storyMusicFadeTimer);
+      storyMusicFadeTimer = null;
+      storyMusic.volume = targetVolume;
+    }
+  }, duration / steps);
+}
+
+function stopStoryMusic() {
+  if (!storyMusic) return;
+
+  if (storyMusicFadeTimer) {
+    clearInterval(storyMusicFadeTimer);
+    storyMusicFadeTimer = null;
+  }
+
+  const startVolume = storyMusic.volume;
+  const duration = 1500;
+  const steps = 15;
+  let step = 0;
+
+  storyMusicFadeTimer = setInterval(() => {
+    step++;
+
+    storyMusic.volume = Math.max(
+      0,
+      startVolume * (1 - step / steps)
+    );
+
+    if (step >= steps) {
+      clearInterval(storyMusicFadeTimer);
+      storyMusicFadeTimer = null;
+
+      storyMusic.pause();
+      storyMusic.currentTime = 0;
+      storyMusic.volume = 0.08;
+    }
+  }, duration / steps);
+}
