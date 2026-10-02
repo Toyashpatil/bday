@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07060a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Before Your Birthday</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<header class="hero wrap">
+  <div class="orbit"></div>
+  <div class="hero-content">
+    <div class="eyebrow">A little something for you</div>
+    <h1>Before<br>your birthday.</h1>
+    <p class="hero-copy">
+      There are a few things waiting for you.<br>
+      But they aren't meant to be opened all at once.
+    </p>
+    <div class="date-pill">02.10 — 20.10 · 2026</div>
+  </div>
+  <div class="scroll">enter the story</div>
+</header>
+
+<main class="wrap">
+  <section class="current-wrap">
+    <div class="current-label">Tonight's chapter</div>
+    <div class="current-card" id="currentCard">
+      <div class="no-current">The next little chapter is still sealed.</div>
+    </div>
+  </section>
+
+  <div class="section-head">
+    <div class="tiny">A little journey</div>
+    <h2>One chapter at a time.</h2>
+  </div>
+
+  <div id="timeline" class="timeline"></div>
+
+  <section class="finale" id="finaleSection">
+    <div class="finale-orbit"><span>✦</span><span>♡</span><span>✧</span></div>
+    <div class="symbol">♡</div>
+    <div class="finale-label">THE LAST PAGE</div>
+    <h2>October 20</h2>
+    <p id="finaleStatus">Some things are worth waiting for.</p>
+    <button class="finale-button" id="finaleButton">Enter the last page</button>
+  </section>
+</main>
+
+<footer>made with a little too much thought ❤️</footer>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="dialog">
+    <button class="close" id="closeButton" aria-label="Close">×</button>
+
+    <div class="stage seal-stage" id="sealStage">
+      <div class="seal-object"><div class="paper"></div></div>
+      <div class="seal-meta" id="sealDay"></div>
+      <h2 id="sealTitle">A little something.</h2>
+      <div class="seal-copy">
+        I could tell you what's inside.<br>
+        But where's the fun in that?
+      </div>
+      <button class="open-button" id="openButton">OPEN</button>
+    </div>
+
+    <div class="stage finale-seal-stage" id="finaleSealStage" hidden>
+      <div class="finale-seal-glow"></div>
+      <div class="finale-envelope">♡</div>
+      <div class="seal-meta">OCTOBER 20 · FOR YOU</div>
+      <h2>There was one more thing.</h2>
+      <div class="seal-copy">
+        The little stories were only the beginning.<br>
+        This one is from me.
+      </div>
+      <button class="open-button finale-open-button" id="finaleOpenButton">OPEN THE LAST PAGE</button>
+    </div>
+
+    <div class="stage finale-letter-stage" id="finaleLetterStage" hidden>
+      <div class="finale-letter-glow"></div>
+      <div class="finale-letter-meta" id="finaleEyebrow"></div>
+      <h2 id="finaleTitle"></h2>
+      <p class="finale-intro" id="finaleIntro"></p>
+      <article class="letter-paper" id="letterPaper"></article>
+      <div class="finale-signoff">Made with a little too much thought. ♡</div>
+    </div>
+
+    <div class="stage story-stage" id="storyStage" hidden>
+      <div class="story-meta" id="storyMeta"></div>
+      <h2 id="storyTitle"></h2>
+      <div class="story-body" id="storyBody"></div>
+
+      <div class="question">
+        <div class="question-label">A little question</div>
+        <h3 id="questionText"></h3>
+        <textarea id="answer" placeholder="Just answer naturally..."></textarea>
+        <button class="save-button" id="saveButton">Keep this little answer ♡</button>
+        <div class="saved" id="saved" hidden>Saved quietly. ♡</div>
+      </div>
+
+      <div class="next-note">That's all for tonight.</div>
+    </div>
+  </div>
+</div>
+
+
+<button class="dev-toggle" id="devToggle" aria-label="Open test mode" hidden>TEST</button>
+<aside class="dev-panel" id="devPanel" aria-label="Developer test mode">
+  <div class="dev-head"><div><strong>Test Mode</strong><span>Private preview controls</span></div><button id="devClose">×</button></div>
+  <label class="dev-check"><input type="checkbox" id="testEnabled"> Enable simulated clock</label>
+  <div class="dev-grid"><label>Date<input type="date" id="testDate" min="2026-10-01" max="2026-10-21"></label><label>Time<input type="time" id="testTime"></label></div>
+  <button class="dev-primary" id="applyTest">Apply simulation</button>
+  <div class="dev-status" id="testStatus"></div>
+  <div class="dev-row"><button id="prevDay">← Previous day</button><button id="nextDay">Next day →</button></div>
+  <div class="dev-row"><button id="lockedPreset">9:59 PM · Locked</button><button id="unlockedPreset">10:00 PM · Unlock</button></div>
+  <button class="dev-wide" id="birthdayPreset">Oct 20 · Grand finale</button>
+  <button class="dev-wide" id="resetAnswers">Reset saved answers</button>
+  <button class="dev-wide" id="liveMode">Return to live visitor clock</button>
+  <p class="dev-hint">Shortcut: Ctrl + Shift + T</p>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="content.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

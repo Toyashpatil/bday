@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday · Private Answers</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body.admin-page { min-height:100vh; padding:32px 18px 60px; }
+    .admin-shell { max-width:1100px; margin:0 auto; }
+    .admin-card { background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.10); border-radius:24px; padding:24px; backdrop-filter:blur(20px); box-shadow:0 20px 70px rgba(0,0,0,.35); }
+    .admin-head { display:flex; justify-content:space-between; gap:16px; align-items:flex-end; margin-bottom:24px; }
+    .admin-eyebrow { color:#d8b5ef; font-size:12px; letter-spacing:.18em; text-transform:uppercase; }
+    .admin-title { font-family:Georgia,serif; font-size:clamp(30px,6vw,52px); margin:7px 0 0; }
+    .admin-muted { color:rgba(255,255,255,.62); }
+    .admin-login { max-width:440px; margin:10vh auto 0; }
+    .admin-form { display:grid; gap:13px; margin-top:22px; }
+    .admin-form input { width:100%; box-sizing:border-box; padding:13px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.25); color:#fff; }
+    .admin-btn { border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.08); color:#fff; padding:11px 15px; border-radius:12px; cursor:pointer; }
+    .admin-btn.primary { background:linear-gradient(135deg,#9e77c9,#d78fbc); border:0; }
+    .admin-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .admin-status { margin-top:14px; color:#e8b9d9; min-height:20px; }
+    .admin-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+    .stat { padding:16px; border:1px solid rgba(255,255,255,.09); border-radius:16px; background:rgba(255,255,255,.03); }
+    .stat b { display:block; font-size:26px; margin-top:5px; }
+    .answers { display:grid; gap:12px; }
+    .answer-row { border:1px solid rgba(255,255,255,.09); border-radius:18px; padding:18px; background:rgba(0,0,0,.18); }
+    .answer-top { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .answer-day { color:#e4bce1; font-weight:600; }
+    .answer-date { color:rgba(255,255,255,.5); font-size:12px; }
+    .answer-question { margin:11px 0 8px; color:rgba(255,255,255,.67); font-size:14px; }
+    .answer-text { white-space:pre-wrap; line-height:1.65; font-size:16px; }
+    .empty { text-align:center; padding:45px 15px; color:rgba(255,255,255,.55); }
+    @media(max-width:650px){ .admin-stats{grid-template-columns:1fr 1fr}.admin-head{align-items:flex-start;flex-direction:column} }
+  </style>
+</head>
+<body class="admin-page">
+  <main class="admin-shell">
+    <section class="admin-card admin-login" id="loginView">
+      <div class="admin-eyebrow">Private · Birthday Archive</div>
+      <h1 class="admin-title">Her little answers.</h1>
+      <p class="admin-muted">Sign in to see the answers collected from the birthday chapters.</p>
+      <form class="admin-form" id="loginForm">
+        <input id="email" type="email" autocomplete="email" placeholder="Admin email" required />
+        <input id="password" type="password" autocomplete="current-password" placeholder="Password" required />
+        <button class="admin-btn primary" type="submit">Sign in</button>
+      </form>
+      <div class="admin-status" id="loginStatus"></div>
+    </section>
+
+    <section class="admin-card" id="dashboardView" hidden>
+      <div class="admin-head">
+        <div>
+          <div class="admin-eyebrow">Private · Birthday Archive</div>
+          <h1 class="admin-title">Her little answers.</h1>
+          <div class="admin-muted" id="adminEmail"></div>
+        </div>
+        <div class="admin-actions">
+          <button class="admin-btn" id="refreshBtn">Refresh</button>
+          <button class="admin-btn" id="csvBtn">Export CSV</button>
+          <button class="admin-btn" id="logoutBtn">Sign out</button>
+        </div>
+      </div>
+
+      <div class="admin-card" style="margin-bottom:18px;padding:18px;">
+        <div class="admin-head" style="margin-bottom:10px;align-items:center;">
+          <div>
+            <div class="admin-eyebrow">Developer Controls</div>
+            <h2 style="margin:5px 0;font-size:22px;">Test mode</h2>
+            <div class="admin-muted">Turn this ON only when you want the TEST button visible on the public site. It is OFF by default.</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;white-space:nowrap;">
+            <input id="testModeToggle" type="checkbox" style="width:20px;height:20px;accent-color:#d78fbc;">
+            <span id="testModeLabel">OFF</span>
+          </label>
+        </div>
+        <div class="admin-status" id="testModeStatus"></div>
+      </div>
+
+      <div class="admin-stats">
+        <div class="stat"><span class="admin-muted">Answered</span><b id="answeredCount">0 / 18</b></div>
+        <div class="stat"><span class="admin-muted">Latest answer</span><b id="latestCount">—</b></div>
+        <div class="stat"><span class="admin-muted">Archive</span><b>Private</b></div>
+      </div>
+
+      <div class="answers" id="answersList"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="content.js"></script>
+  <script>
+    const cfg = window.BIRTHDAY_BACKEND || {};
+    const client = cfg.url && cfg.anonKey ? window.supabase.createClient(cfg.url, cfg.anonKey) : null;
+    let rows = [];
+    const $ = s => document.querySelector(s);
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    const questionFor = day => (window.BIRTHDAY_CONTENT || []).find(x => x.day === day)?.question || '';
+
+    function setStatus(message) { $('#loginStatus').textContent = message || ''; }
+    function setTestModeStatus(message) { $('#testModeStatus').textContent = message || ''; }
+
+    async function loadTestMode() {
+      const { data, error } = await client.rpc('get_test_mode');
+      if (error) { setTestModeStatus(error.message); return; }
+      $('#testModeToggle').checked = data === true;
+      $('#testModeLabel').textContent = data ? 'ON · TEST visible' : 'OFF · visitor mode';
+    }
+
+    async function toggleTestMode() {
+      const enabled = $('#testModeToggle').checked;
+      $('#testModeLabel').textContent = 'Saving…';
+      const { data, error } = await client.rpc('set_test_mode', { p_enabled: enabled });
+      if (error) {
+        $('#testModeToggle').checked = !enabled;
+        $('#testModeLabel').textContent = !enabled ? 'ON · TEST visible' : 'OFF · visitor mode';
+        setTestModeStatus(error.message);
+        return;
+      }
+      $('#testModeLabel').textContent = data ? 'ON · TEST visible' : 'OFF · visitor mode';
+      setTestModeStatus(data ? 'Test controls are now visible on the public site. Reload the public page to see them.' : 'Test controls are hidden from the public site.');
+    }
+
+    async function loadSession() {
+      if (!client) { setStatus('Add config.js with your Supabase URL and anon/publishable key first.'); return; }
+      const { data } = await client.auth.getSession();
+      if (data.session) showDashboard(data.session.user);
+    }
+
+    function showDashboard(user) {
+      $('#loginView').hidden = true;
+      $('#dashboardView').hidden = false;
+      $('#adminEmail').textContent = user.email || '';
+      loadTestMode();
+      loadAnswers();
+    }
+
+    async function login(event) {
+      event.preventDefault();
+      if (!client) return setStatus('Backend is not configured.');
+      setStatus('Signing in…');
+      const { data, error } = await client.auth.signInWithPassword({ email: $('#email').value.trim(), password: $('#password').value });
+      if (error) return setStatus(error.message);
+      setStatus('');
+      showDashboard(data.user);
+    }
+
+    async function loadAnswers() {
+      $('#answersList').innerHTML = '<div class="empty">Loading the little archive…</div>';
+      const { data, error } = await client.from('birthday_answers').select('chapter_day,answer,answered_at,updated_at').order('chapter_day', { ascending:true });
+      if (error) {
+        $('#answersList').innerHTML = `<div class="empty">Could not load answers.<br>${esc(error.message)}</div>`;
+        return;
+      }
+      rows = data || [];
+      $('#answeredCount').textContent = `${rows.length} / 18`;
+      $('#latestCount').textContent = rows.length ? new Date(rows[rows.length - 1].updated_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : '—';
+      if (!rows.length) {
+        $('#answersList').innerHTML = '<div class="empty">No answers yet. The first little chapter is waiting. ♡</div>';
+        return;
+      }
+      $('#answersList').innerHTML = rows.map(row => `
+        <article class="answer-row">
+          <div class="answer-top"><span class="answer-day">Day ${row.chapter_day}</span><span class="answer-date">${new Date(row.updated_at).toLocaleString('en-IN')}</span></div>
+          <div class="answer-question">${esc(questionFor(row.chapter_day))}</div>
+          <div class="answer-text">${esc(row.answer)}</div>
+        </article>`).join('');
+    }
+
+    function exportCSV() {
+      const header = ['chapter_day','question','answer','updated_at'];
+      const csv = [header, ...rows.map(r => [r.chapter_day, questionFor(r.chapter_day), r.answer, r.updated_at])]
+        .map(row => row.map(v => `"${String(v ?? '').replaceAll('"','""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'birthday-answers.csv'; a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    $('#loginForm').addEventListener('submit', login);
+    $('#refreshBtn').addEventListener('click', async () => { await loadTestMode(); await loadAnswers(); });
+    $('#testModeToggle').addEventListener('change', toggleTestMode);
+    $('#csvBtn').addEventListener('click', exportCSV);
+    $('#logoutBtn').addEventListener('click', async () => { await client.auth.signOut(); $('#dashboardView').hidden=true; $('#loginView').hidden=false; });
+    loadSession();
+  </script>
+</body>
+</html>
