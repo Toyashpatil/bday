@@ -7,6 +7,7 @@ const STORAGE_PREFIX = "birthday2026_";
 const BACKEND_CONFIG = window.BIRTHDAY_BACKEND || {};
 let supabaseClient = null;
 let remoteTestModeEnabled = false;
+let remoteManualUnlocks = {};
 
 function initBackend() {
   if (!BACKEND_CONFIG.url || !BACKEND_CONFIG.anonKey || !window.supabase) return false;
@@ -29,17 +30,21 @@ function visitorId() {
   return id;
 }
 
-async function loadRemoteTestMode() {
-  if (!supabaseClient) return false;
+async function loadRemoteSettings() {
+  if (!supabaseClient) return;
   try {
-    const { data, error } = await supabaseClient.rpc("get_test_mode");
-    if (error) throw error;
-    remoteTestModeEnabled = data === true;
-    return remoteTestModeEnabled;
+    const [{ data: testMode, error: testError }, { data: manualUnlocks, error: unlockError }] = await Promise.all([
+      supabaseClient.rpc("get_test_mode"),
+      supabaseClient.rpc("get_manual_unlocks")
+    ]);
+    if (testError) throw testError;
+    if (unlockError) throw unlockError;
+    remoteTestModeEnabled = testMode === true;
+    remoteManualUnlocks = manualUnlocks && typeof manualUnlocks === "object" ? manualUnlocks : {};
   } catch (error) {
-    console.warn("Could not load test mode setting; keeping it hidden.", error);
+    console.warn("Could not load remote settings; keeping manual unlocks disabled.", error);
     remoteTestModeEnabled = false;
-    return false;
+    remoteManualUnlocks = {};
   }
 }
 
@@ -87,7 +92,7 @@ function unlockAt(item) {
 }
 
 function isUnlocked(item) {
-  return localNow() >= unlockAt(item);
+  return remoteManualUnlocks[String(item.day)] === true || localNow() >= unlockAt(item);
 }
 
 function formatDate(dateString) {
@@ -176,7 +181,7 @@ function renderTimeline() {
 
 function isBirthdayFinaleUnlocked() {
   const finaleDate = new Date(2026, 9, 20, UNLOCK_HOUR, 0, 0);
-  return localNow() >= finaleDate;
+  return remoteManualUnlocks.finale === true || localNow() >= finaleDate;
 }
 
 function openBirthdayDay(day) { openChapter(day); }
@@ -530,7 +535,7 @@ function refreshAtNextUnlock() {
 
 async function setup() {
   initBackend();
-  await loadRemoteTestMode();
+  await loadRemoteSettings();
   if (!remoteTestModeEnabled) {
     testState.enabled = false;
     persistTestState();

@@ -77,6 +77,18 @@
         <div class="admin-status" id="testModeStatus"></div>
       </div>
 
+      <div class="admin-card" style="margin-bottom:18px;padding:18px;">
+        <div class="admin-head" style="margin-bottom:10px;align-items:center;">
+          <div>
+            <div class="admin-eyebrow">Emergency Fallback</div>
+            <h2 style="margin:5px 0;font-size:22px;">Manual chapter unlocks</h2>
+            <div class="admin-muted">Use only if the 10:00 PM automatic unlock does not happen. A checked chapter opens immediately on the public site.</div>
+          </div>
+        </div>
+        <div id="manualUnlockList" style="display:grid;gap:9px;"></div>
+        <div class="admin-status" id="manualUnlockStatus"></div>
+      </div>
+
       <div class="admin-stats">
         <div class="stat"><span class="admin-muted">Answered</span><b id="answeredCount">0 / 18</b></div>
         <div class="stat"><span class="admin-muted">Latest answer</span><b id="latestCount">—</b></div>
@@ -100,6 +112,7 @@
 
     function setStatus(message) { $('#loginStatus').textContent = message || ''; }
     function setTestModeStatus(message) { $('#testModeStatus').textContent = message || ''; }
+    function setManualUnlockStatus(message) { $('#manualUnlockStatus').textContent = message || ''; }
 
     async function loadTestMode() {
       const { data, error } = await client.rpc('get_test_mode');
@@ -122,6 +135,52 @@
       setTestModeStatus(data ? 'Test controls are now visible on the public site. Reload the public page to see them.' : 'Test controls are hidden from the public site.');
     }
 
+    async function loadManualUnlocks() {
+      const { data, error } = await client.rpc('get_manual_unlocks');
+      if (error) { setManualUnlockStatus(error.message); return; }
+      const unlocks = data && typeof data === 'object' ? data : {};
+      const items = (window.BIRTHDAY_CONTENT || []).slice().sort((a,b) => a.day - b.day);
+      $('#manualUnlockList').innerHTML = items.map(item => `
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(0,0,0,.16);cursor:pointer;">
+          <span>
+            <strong>Day ${item.day} · ${esc(item.title || 'Chapter')}</strong>
+            <span class="admin-muted" style="display:block;font-size:12px;margin-top:3px;">${esc(item.date)}</span>
+          </span>
+          <input class="manual-unlock-toggle" data-day="${item.day}" type="checkbox" ${unlocks[String(item.day)] === true ? 'checked' : ''} style="width:20px;height:20px;accent-color:#d78fbc;">
+        </label>`).join('') + `
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(0,0,0,.16);cursor:pointer;">
+          <span>
+            <strong>October 20 · Grand Finale</strong>
+            <span class="admin-muted" style="display:block;font-size:12px;margin-top:3px;">Final birthday letter</span>
+          </span>
+          <input class="manual-unlock-toggle" data-day="finale" type="checkbox" ${unlocks.finale === true ? 'checked' : ''} style="width:20px;height:20px;accent-color:#d78fbc;">
+        </label>`;
+
+      document.querySelectorAll('.manual-unlock-toggle').forEach(input => {
+        input.addEventListener('change', () => toggleManualUnlock(input));
+      });
+    }
+
+    async function toggleManualUnlock(input) {
+      const key = input.dataset.day;
+      const enabled = input.checked;
+      input.disabled = true;
+      setManualUnlockStatus('Saving…');
+      const args = key === 'finale'
+        ? { p_chapter_day: 0, p_enabled: enabled }
+        : { p_chapter_day: Number(key), p_enabled: enabled };
+      const { error } = await client.rpc('set_manual_unlock', args);
+      input.disabled = false;
+      if (error) {
+        input.checked = !enabled;
+        setManualUnlockStatus(error.message);
+        return;
+      }
+      setManualUnlockStatus(enabled
+        ? (key === 'finale' ? 'Grand Finale is now manually unlocked. Reload the public site.' : `Day ${key} is now manually unlocked. Reload the public site.`)
+        : (key === 'finale' ? 'Grand Finale automatic timing restored. Reload the public site.' : `Day ${key} automatic timing restored. Reload the public site.`));
+    }
+
     async function loadSession() {
       if (!client) { setStatus('Add config.js with your Supabase URL and anon/publishable key first.'); return; }
       const { data } = await client.auth.getSession();
@@ -133,6 +192,7 @@
       $('#dashboardView').hidden = false;
       $('#adminEmail').textContent = user.email || '';
       loadTestMode();
+      loadManualUnlocks();
       loadAnswers();
     }
 
@@ -177,7 +237,7 @@
     }
 
     $('#loginForm').addEventListener('submit', login);
-    $('#refreshBtn').addEventListener('click', async () => { await loadTestMode(); await loadAnswers(); });
+    $('#refreshBtn').addEventListener('click', async () => { await loadTestMode(); await loadManualUnlocks(); await loadAnswers(); });
     $('#testModeToggle').addEventListener('change', toggleTestMode);
     $('#csvBtn').addEventListener('click', exportCSV);
     $('#logoutBtn').addEventListener('click', async () => { await client.auth.signOut(); $('#dashboardView').hidden=true; $('#loginView').hidden=false; });
