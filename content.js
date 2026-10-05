@@ -64,12 +64,9 @@ window.BIRTHDAY_CONTENT = [
     "Maybe sometimes a song chooses a moment, and the moment chooses the song.",
 
     "So, before this little chapter ends, I have one very simple question:",
-
-    "If you had to pick one song that could represent your current favourite feeling, which song would you choose?",
-
-    "No overthinking. Just the first one that came to mind. ♡"
+    "I think everyone has that one song they never really get tired of. I wonder which one yours is."
   ],
-  question: "What's your one song?"
+  question: "I think everyone has that one song they never really get tired of. I wonder which one yours is."
 },
 
 {
