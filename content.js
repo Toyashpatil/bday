@@ -63,7 +63,6 @@ window.BIRTHDAY_CONTENT = [
 
     "Maybe sometimes a song chooses a moment, and the moment chooses the song.",
 
-    "So, before this little chapter ends, I have one very simple question:",
     "I think everyone has that one song they never really get tired of. I wonder which one yours is."
   ],
   question: "I think everyone has that one song they never really get tired of. I wonder which one yours is."
