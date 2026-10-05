@@ -33,26 +33,142 @@ window.BIRTHDAY_CONTENT = [
     question: "What would that evening look like?"
   },
   {
-    date: "2026-10-03",
-    day: 17,
-    title: "A tiny coincidence",
-    story: ["Tomorrow's carefully chosen story will live here."],
-    question: "The second hidden question will go here."
-  },
-  {
-    date: "2026-10-04",
-    day: 16,
-    title: "Something worth knowing",
-    story: ["A surprising discovery will live here."],
-    question: "The third hidden question will go here."
-  },
-  {
-    date: "2026-10-05",
-    day: 15,
-    title: "A story from somewhere",
-    story: ["A beautiful story from India or somewhere around the world will live here."],
-    question: "The fourth hidden question will go here."
-  },
+  date: "2026-10-03",
+  day: 17,
+  title: "The strange thing about a song",
+  story: [
+    "There is a funny little thing people do without really deciding to do it.",
+
+    "They give a song to a person.",
+
+    "Not literally, of course.",
+
+    "But somewhere along the way, a song becomes theirs.",
+
+    "Researchers studying music and romantic relationships have actually found this often enough to give it a name: “couple-defining songs.”",
+
+    "In one study, 60% of participants said they had a song associated with their relationship.",
+
+    "And the interesting part isn't really the song.",
+
+    "It's what happens afterward.",
+
+    "Years later, the first few seconds can bring back a particular person, a particular evening, a particular version of yourself.",
+
+    "Music can act almost like a shortcut to memory — a familiar song can suddenly bring back an experience and the feelings that came with it.",
+
+    "Which makes me wonder...",
+
+    "Maybe we don't really choose our favourite songs.",
+
+    "Maybe sometimes a song chooses a moment, and the moment chooses the song.",
+
+    "So, before this little chapter ends, I have one very simple question:",
+
+    "If you had to pick one song that could represent your current favourite feeling, which song would you choose?",
+
+    "No overthinking. Just the first one that came to mind. ♡"
+  ],
+  question: "What's your one song?"
+},
+
+{
+  date: "2026-10-04",
+  day: 16,
+  title: "The little things",
+  story: [
+    "There are a lot of ways people try to show someone they care.",
+
+    "Flowers. Gifts. Long messages. Big surprises.",
+
+    "But strangely, the things people remember aren't always the big ones.",
+
+    "Sometimes it's someone remembering how you take your coffee.",
+
+    "Asking how something went because you mentioned it three days ago.",
+
+    "Sending you something and saying, “This reminded me of you.”",
+
+    "Remembering the food you don't like.",
+
+    "Or noticing that you're quieter than usual without you having to explain why.",
+
+    "None of those things look particularly romantic from the outside.",
+
+    "They're almost too small to notice.",
+
+    "But maybe that's exactly why they matter.",
+
+    "Because anyone can do something impressive once.",
+
+    "Paying attention to the little things is different.",
+
+    "It quietly says:",
+
+    "“I notice you.”",
+
+    "And maybe being noticed — properly noticed — is one of the nicest ways of being cared for.",
+
+    "So tonight I'm curious about something ridiculously small.",
+
+    "What's one small thing someone can do that instantly makes you feel cared for?",
+
+    "It doesn't have to make sense to anyone else. Those are usually the best ones. ♡"
+  ],
+  question: "What little thing makes you feel cared for?"
+},
+
+{
+  date: "2026-10-05",
+  day: 15,
+  title: "The unofficial science of making someone smile",
+  story: [
+    "There is, apparently, no universal formula for making someone smile.",
+
+    "Some people need a perfectly timed joke.",
+
+    "Some need food.",
+
+    "Some need a ridiculous reel at 2 AM.",
+
+    "Some just need their favourite person to say something stupid.",
+
+    "And then there are people who will insist:",
+
+    "“I'm not smiling.”",
+
+    "...while very obviously smiling.",
+
+    "The funny thing is that romance has never really been only about grand gestures anyway.",
+
+    "It's usually the tiny, slightly ridiculous things that become special.",
+
+    "A stupid nickname.",
+
+    "A song sent for absolutely no reason.",
+
+    "Someone remembering that you hate a particular food.",
+
+    "A message saying, “Look what I found, this reminded me of you.”",
+
+    "Or that one person who somehow knows exactly when to disturb your peace...",
+
+    "and exactly when not to.",
+
+    "Maybe that's the real superpower of getting to know someone.",
+
+    "Not knowing everything about them.",
+
+    "Just slowly collecting the little things that make them laugh.",
+
+    "So, purely for scientific research, obviously...",
+
+    "If I had exactly 30 seconds to make you smile on a terrible day, what would I need to do?",
+
+    "You can make the answer as ridiculous as you want. ♡"
+  ],
+  question: "If I had exactly 30 seconds to make you smile on a terrible day, what would I need to do?"
+},
   {
     date: "2026-10-06",
     day: 14,
